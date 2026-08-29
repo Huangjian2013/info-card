@@ -1,0 +1,299 @@
+/* 卡片本体：由 JS 写入的自定义属性驱动颜色和比例
+   --bg-a / --bg-b / --accent / --fg / --fg-sub / --ar-w / --ar-h */
+
+.card {
+  aspect-ratio: var(--ar-w, 1) / var(--ar-h, 1);
+}
+
+.card-index {
+  position: absolute;
+  font-size: 12px;
+  letter-spacing: 2px;
+  opacity: 0.8;
+  z-index: 2;
+}
+
+.card-keyword,
+.card-detail {
+  outline: none;
+}
+
+.card-keyword:focus,
+.card-detail:focus {
+  outline: 1px dashed rgba(0, 0, 0, 0.2);
+  outline-offset: 4px;
+}
+
+/* ---------- 模板 1：简约大字风 ---------- */
+
+.tpl-bold {
+  background: linear-gradient(150deg, var(--bg-a), var(--bg-b));
+  color: var(--fg);
+}
+
+.tpl-bold .card-index {
+  top: 18px;
+  left: 20px;
+  color: var(--fg-sub);
+}
+
+.tpl-bold .card-keyword {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(28px, 9vw, 46px);
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--fg);
+  padding: 44px 26px 8px;
+}
+
+.tpl-bold .card-detail {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--fg-sub);
+  padding: 0 28px 40px;
+}
+
+/* ---------- 模板 2：杂志感排版 ---------- */
+
+.tpl-magazine {
+  background: #ffffff;
+  color: #1a1a1a;
+  padding-left: 10px;
+}
+
+.tpl-magazine::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--accent);
+  z-index: 1;
+}
+
+.tpl-magazine .card-index {
+  top: 20px;
+  right: 24px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tpl-magazine .card-keyword {
+  margin-top: 56px;
+  padding: 0 30px 0 26px;
+  font-family: "Songti SC", "STSong", serif;
+  font-size: clamp(24px, 7vw, 36px);
+  font-weight: 700;
+  line-height: 1.35;
+  color: #1a1a1a;
+}
+
+.tpl-magazine .card-detail {
+  margin: 18px 26px 0;
+  padding-top: 14px;
+  padding-right: 8px;
+  padding-bottom: 32px;
+  border-top: 1px solid #ececec;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #555;
+}
+
+/* ---------- 模板 3：极简黑白 ---------- */
+
+.tpl-mono {
+  background: #101010;
+  color: #ffffff;
+}
+
+.tpl-mono .card-index {
+  bottom: 20px;
+  left: 26px;
+  top: auto;
+  color: var(--accent);
+  letter-spacing: 3px;
+}
+
+.tpl-mono .card-keyword {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  font-size: clamp(26px, 8vw, 40px);
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 30px 26px 14px;
+  color: #ffffff;
+}
+
+.tpl-mono .card-detail {
+  margin: 0 26px;
+  padding: 14px 0 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ---------- 模板 4：手账贴纸风 ---------- */
+
+.tpl-sticky {
+  background: #fffdf7;
+  color: #3a3226;
+  border: 2px dashed rgba(0, 0, 0, 0.15);
+  transform: rotate(-1deg);
+}
+
+.tpl-sticky::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 46%;
+  height: 32px;
+  background: var(--accent);
+  opacity: 0.85;
+  border-radius: 3px;
+  z-index: 2;
+}
+
+.tpl-sticky .card-index {
+  top: 24px;
+  right: 22px;
+  color: var(--accent);
+  font-weight: 700;
+  z-index: 2;
+}
+
+.tpl-sticky .card-keyword {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(26px, 8vw, 42px);
+  font-weight: 800;
+  line-height: 1.4;
+  padding: 58px 30px 10px;
+  color: var(--accent);
+  position: relative;
+  z-index: 2;
+}
+
+.tpl-sticky .card-detail {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #6b5f4d;
+  padding: 0 32px 46px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- 模板 5：商务简报风 ---------- */
+
+.tpl-business {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+.tpl-business::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(90deg, var(--bg-a), var(--bg-b));
+  z-index: 2;
+}
+
+.tpl-business .card-index {
+  top: 28px;
+  left: 28px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 2px;
+  z-index: 2;
+}
+
+.tpl-business .card-keyword {
+  margin-top: 72px;
+  padding: 0 28px;
+  font-size: clamp(24px, 7vw, 38px);
+  font-weight: 800;
+  line-height: 1.3;
+  color: #111111;
+  position: relative;
+  z-index: 2;
+}
+
+.tpl-business .card-detail {
+  margin: 16px 28px 0;
+  padding-top: 14px;
+  padding-bottom: 34px;
+  border-top: 2px solid var(--accent);
+  font-size: 14px;
+  line-height: 1.7;
+  color: #444444;
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- 模板 6：霓虹渐变风 ---------- */
+
+.tpl-neon {
+  background: #0b0b12;
+  color: #ffffff;
+}
+
+.tpl-neon::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  right: -10%;
+  height: 70%;
+  background: radial-gradient(ellipse at center, var(--bg-a) 0%, transparent 70%);
+  opacity: 0.55;
+  z-index: 0;
+}
+
+.tpl-neon .card-index {
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent);
+  z-index: 2;
+}
+
+.tpl-neon .card-keyword {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(28px, 9vw, 46px);
+  font-weight: 800;
+  line-height: 1.3;
+  padding: 44px 26px 8px;
+  color: #ffffff;
+  text-shadow: 0 0 10px var(--accent), 0 0 26px var(--accent);
+  position: relative;
+  z-index: 2;
+}
+
+.tpl-neon .card-detail {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  padding: 0 30px 40px;
+  position: relative;
+  z-index: 2;
+}
+

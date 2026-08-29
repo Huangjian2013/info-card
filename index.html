@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>微博配图生成器</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/templates.css" />
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-bar">
+    <div class="header-titles">
+      <h1>微博配图生成器</h1>
+      <p class="subtitle">贴文案 → AI 拆成信息点 → 生成手机尺寸信息卡 → 截图导出配图</p>
+    </div>
+    <button id="btnOpenSettings" class="btn btn-ghost settings-btn" type="button">⚙️ 设置</button>
+  </div>
+</header>
+
+<div id="settingsOverlay" class="modal-overlay" hidden>
+  <div class="modal-panel">
+    <div class="modal-panel-header">
+      <h2>设置</h2>
+      <button id="btnCloseSettings" class="btn btn-ghost btn-small" type="button">✕</button>
+    </div>
+
+    <div class="settings-grid">
+
+      <div class="field">
+        <label for="apiKeyInput">OpenRouter API Key</label>
+        <div class="input-with-btn">
+          <input id="apiKeyInput" type="password" placeholder="sk-or-..." autocomplete="off" />
+          <button id="toggleKeyVisibility" class="btn btn-ghost" type="button">👁</button>
+        </div>
+        <p class="hint">Key 只保存在你浏览器的 localStorage 里，请求由浏览器直接发给 OpenRouter，不经过任何服务器。可在 <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a> 获取。</p>
+      </div>
+
+      <div class="field">
+        <label for="modelSelect">模型</label>
+        <select id="modelSelect">
+          <option value="deepseek/deepseek-v4-flash-0731">deepseek/deepseek-v4-flash-0731（默认，便宜快、中文强）</option>
+          <option value="deepseek/deepseek-chat">deepseek/deepseek-chat</option>
+          <option value="google/gemini-2.5-flash">google/gemini-2.5-flash</option>
+          <option value="anthropic/claude-sonnet-4.5">anthropic/claude-sonnet-4.5（质量更高更贵）</option>
+          <option value="qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b-instruct</option>
+          <option value="custom">自定义模型 ID…</option>
+        </select>
+        <input id="customModelInput" type="text" placeholder="例如 mistralai/mistral-large" hidden />
+      </div>
+
+      <div class="field">
+        <label>图片比例</label>
+        <div class="ratio-row">
+          <button type="button" class="btn btn-ghost ratio-preset" data-w="1" data-h="1">1:1</button>
+          <button type="button" class="btn btn-ghost ratio-preset" data-w="3" data-h="4">3:4</button>
+          <button type="button" class="btn btn-ghost ratio-preset" data-w="9" data-h="16">9:16</button>
+          <input id="ratioW" type="number" min="0.1" step="0.1" class="ratio-input" />
+          <span>:</span>
+          <input id="ratioH" type="number" min="0.1" step="0.1" class="ratio-input" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <section class="panel">
+    <div class="field">
+      <label for="weiboText">微博文案</label>
+      <textarea id="weiboText" rows="8" placeholder="把你的微博文案粘贴到这里…"></textarea>
+    </div>
+
+    <div class="field field-inline">
+      <label for="cardCount">生成张数</label>
+      <input id="cardCount" type="number" min="1" max="20" />
+    </div>
+
+    <div class="actions">
+      <button id="btnSplit" class="btn btn-primary">① 拆分要点</button>
+      <button id="btnPipeline" class="btn btn-accent">🚀 一键生成全部</button>
+    </div>
+
+    <div id="errorBanner" class="banner banner-error" hidden></div>
+    <div id="busyBanner" class="banner banner-busy" hidden></div>
+  </section>
+
+  <section class="panel">
+    <div class="style-grid">
+      <div class="field">
+        <label>卡片风格</label>
+        <select id="templateSelect">
+          <option value="bold">简约大字风</option>
+          <option value="magazine">杂志感排版</option>
+          <option value="mono">极简黑白</option>
+          <option value="sticky">手账贴纸风</option>
+          <option value="business">商务简报风</option>
+          <option value="neon">霓虹渐变风</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>配色</label>
+        <div id="themeSwatches" class="swatches"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cardsSection" class="panel" hidden>
+    <div class="section-header">
+      <h2>信息卡预览</h2>
+      <button id="btnDownloadAll" class="btn btn-accent">⬇ 下载全部（zip）</button>
+    </div>
+    <div id="cardsGrid" class="cards-grid"></div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="js/state.js"></script>
+<script src="js/openrouter.js"></script>
+<script src="js/render.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
