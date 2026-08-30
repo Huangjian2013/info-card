@@ -27,6 +27,20 @@ function getEffectiveModel() {
   return state.useCustomModel && state.customModel.trim() ? state.customModel.trim() : state.model;
 }
 
+function getEffectiveImageModel() {
+  return state.useCustomImageModel && state.customImageModel.trim() ? state.customImageModel.trim() : state.imageModel;
+}
+
+async function generateImageForCard(i) {
+  const theme = getTheme(state.themeId);
+  const data = ensureInfographicShape(state.cards[i], i);
+  const prompt = buildImagePrompt(data, theme);
+  const dataUrl = await generateCardImage(prompt, getEffectiveImageModel(), state.apiKey, state.aspectW, state.aspectH);
+  state.cards[i].imageB64 = dataUrl;
+  persist();
+  return dataUrl;
+}
+
 function readInputsIntoState() {
   state.weiboText = document.getElementById("weiboText").value;
   state.count = Math.max(1, Math.min(20, Number(document.getElementById("cardCount").value) || 1));
@@ -57,7 +71,7 @@ async function doSplit() {
 
   setBusy(true, "AI 正在拆解文案…");
   try {
-    const points = await splitTextIntoPoints(state.weiboText, state.count, getEffectiveModel(), state.apiKey);
+    const points = await splitTextIntoPoints(state.weiboText, state.count, getEffectiveModel(), state.apiKey, state.template);
     state.cards = points;
     persist();
     renderCards();
@@ -73,17 +87,41 @@ async function doPipeline() {
   readInputsIntoState();
   if (!validateBeforeCall()) return;
 
-  if (state.cards.length) {
+  const skipResplit = state.template === "aidraw" && state.cards.length > 0;
+
+  if (state.cards.length && !skipResplit) {
     const ok = confirm("一键生成会覆盖当前已编辑的卡片文字，确定继续吗？");
     if (!ok) return;
   }
 
+  if (state.template === "aidraw") {
+    const pendingCount = skipResplit ? state.cards.filter((c) => !c.imageB64).length : state.count;
+    if (skipResplit && pendingCount === 0) {
+      showError("所有卡片都已经生成过图片了，可以直接点上面的「下载全部（zip）」");
+      return;
+    }
+    const ok2 = confirm(`即将为 ${pendingCount} 张卡片调用 AI 绘图模型生成整图（已经生成过的会跳过），会产生额外费用（具体价格以 OpenRouter 该模型页面为准），确定继续吗？`);
+    if (!ok2) return;
+  }
+
   setBusy(true, "AI 正在拆解文案…");
   try {
-    const points = await splitTextIntoPoints(state.weiboText, state.count, getEffectiveModel(), state.apiKey);
-    state.cards = points;
-    persist();
-    renderCards();
+    if (!skipResplit) {
+      const points = await splitTextIntoPoints(state.weiboText, state.count, getEffectiveModel(), state.apiKey, state.template);
+      state.cards = points;
+      persist();
+      renderCards();
+    }
+
+    if (state.template === "aidraw") {
+      for (let i = 0; i < state.cards.length; i++) {
+        if (state.cards[i].imageB64) continue;
+        setBusy(true, `正在生成第 ${i + 1}/${state.cards.length} 张图片…`);
+        await generateImageForCard(i);
+      }
+      renderCards();
+    }
+
     await downloadAllCards();
   } catch (e) {
     showError(e.message);
@@ -131,6 +169,36 @@ function initSettingsUI() {
 
   customModelInput.addEventListener("input", () => {
     state.customModel = customModelInput.value;
+    persist();
+  });
+
+  const imageModelSelect = document.getElementById("imageModelSelect");
+  const customImageModelInput = document.getElementById("customImageModelInput");
+  const imagePresetIds = Array.from(imageModelSelect.options).map((o) => o.value).filter((v) => v !== "custom");
+
+  if (state.useCustomImageModel || !imagePresetIds.includes(state.imageModel)) {
+    imageModelSelect.value = "custom";
+    customImageModelInput.hidden = false;
+    customImageModelInput.value = state.customImageModel;
+  } else {
+    imageModelSelect.value = state.imageModel;
+  }
+
+  imageModelSelect.addEventListener("change", () => {
+    if (imageModelSelect.value === "custom") {
+      state.useCustomImageModel = true;
+      customImageModelInput.hidden = false;
+      customImageModelInput.focus();
+    } else {
+      state.useCustomImageModel = false;
+      state.imageModel = imageModelSelect.value;
+      customImageModelInput.hidden = true;
+    }
+    persist();
+  });
+
+  customImageModelInput.addEventListener("input", () => {
+    state.customImageModel = customImageModelInput.value;
     persist();
   });
 

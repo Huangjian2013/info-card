@@ -51,6 +51,19 @@
       </div>
 
       <div class="field">
+        <label for="imageModelSelect">AI 绘图模型（仅"AI 绘图"风格用）</label>
+        <select id="imageModelSelect">
+          <option value="bytedance-seed/seedream-5-0-pro">bytedance-seed/seedream-5-0-pro</option>
+          <option value="x-ai/grok-imagine-image-2.0">x-ai/grok-imagine-image-2.0</option>
+          <option value="qwen/qwen-image-3-pro">qwen/qwen-image-3-pro</option>
+          <option value="qwen/qwen-image-3">qwen/qwen-image-3</option>
+          <option value="custom">自定义模型 ID…</option>
+        </select>
+        <input id="customImageModelInput" type="text" placeholder="例如 black-forest-labs/flux-pro" hidden />
+        <p class="hint">按张计费，具体价格以 OpenRouter 该模型页面为准；生成的图片不会存进本地存储，刷新页面前请先下载。</p>
+      </div>
+
+      <div class="field">
         <label>图片比例</label>
         <div class="ratio-row">
           <button type="button" class="btn btn-ghost ratio-preset" data-w="1" data-h="1">1:1</button>
@@ -96,9 +109,8 @@
           <option value="bold">简约大字风</option>
           <option value="magazine">杂志感排版</option>
           <option value="mono">极简黑白</option>
-          <option value="sticky">手账贴纸风</option>
           <option value="business">商务简报风</option>
-          <option value="neon">霓虹渐变风</option>
+          <option value="aidraw">AI 绘图（整图生成）</option>
         </select>
       </div>
 
@@ -122,6 +134,7 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="js/state.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/openrouter.js"></script>
 <script src="js/render.js"></script>
 <script src="js/export.js"></script>
